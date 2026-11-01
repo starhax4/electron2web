@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.0-beta.4
 
 - A start screen (name, spinner, what it's waiting for) replaces the blank gray tab while the
   main process starts up, in every layout. Once windows have shown, the same spot says when none
