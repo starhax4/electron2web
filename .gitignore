@@ -8,3 +8,6 @@ dist/
 Thumbs.db
 .vscode/
 .idea/
+
+# Local-only notes (launch plans, internal docs)
+.internal/

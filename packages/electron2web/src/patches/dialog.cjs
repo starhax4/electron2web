@@ -2,7 +2,7 @@
 
 // The real windows stay hidden, and a dialog parented to a hidden window may never
 // appear (Windows) or attach as an invisible sheet (macOS). Show dialogs unparented.
-// (The in-tab web surface for dialogs lands in P1; until then dialogs stay native.)
+// (In-tab dialogs are on the roadmap; until then dialogs stay native.)
 module.exports = {
   name: 'dialog',
   install({ dialog, BaseWindow }) {

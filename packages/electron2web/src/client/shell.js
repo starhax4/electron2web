@@ -235,8 +235,8 @@
     });
     drag(bar, id, (start, dx, dy) => ({ ...start, x: start.x + dx, y: start.y + dy }));
     drag(grip, id, (start, dx, dy) => {
-      const view = views.get(id);
-      return { ...start, width: Math.max(start.width + dx, view.minWidth || 160), height: Math.max(start.height + dy, view.minHeight || 100) };
+      const current = views.get(id);
+      return { ...start, width: Math.max(start.width + dx, current.minWidth || 160), height: Math.max(start.height + dy, current.minHeight || 100) };
     });
 
     const panel = { root, bar, number, title, minimize, maximize, close, frame, blocker, grip, nav: -1 };

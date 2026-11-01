@@ -6,10 +6,11 @@ const { createHash } = require('node:crypto');
 const { builtinModules } = require('node:module');
 const esbuild = require('esbuild');
 const log = require('./log.cjs');
+const { PREFIX } = require('./constants.cjs');
 
 const RUNTIME_ENTRY = path.join(__dirname, 'client', 'runtime.js');
 const NODE_BUILTINS = new Set(builtinModules.flatMap((name) => [name, `node:${name}`]));
-const MAP_PATH = '/__electron2web/map';
+const MAP_PATH = `${PREFIX}/map`;
 
 // Source maps are served separately (DevTools only fetches them when open), keyed by the
 // hash of the code they belong to, so the scripts themselves stay small.

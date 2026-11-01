@@ -40,17 +40,21 @@ WebSocket.
 
 ## Docs
 
-- [Package README](packages/electron2web/README.md): options, how it works, security, what's not supported yet
-- [HOW-TO-USE.md](HOW-TO-USE.md): step-by-step setup, troubleshooting, use from another machine
-- [Roadmap: full Electron API coverage](docs/electron-api-coverage-plan.md)
+- [User guide](docs/guide.md): install, the sample app, your own app, remote use, troubleshooting
+- [Package README](packages/electron2web/README.md): options, agent API, how it works, security, limits
+- [Roadmap](docs/roadmap.md): coverage of the rest of the Electron API
 - [Changelog](packages/electron2web/CHANGELOG.md)
 
 ## Repo layout
 
 ```
-packages/electron2web/   the CLI and bridge (published to npm)
+packages/electron2web/   the CLI and bridge (the published package)
+  bin/                   CLI entry point
+  src/                   hook, bridge server, patches, bundler
+  src/client/            code that runs in the browser (runtime, shell)
+  test/                  unit tests (node --test)
 examples/basic-app/      electron-vite sample app with 12 IPC self-checks
-docs/                    roadmap and release notes
+docs/                    user guide and roadmap
 ```
 
 ## Contributing

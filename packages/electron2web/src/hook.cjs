@@ -38,9 +38,10 @@ function safeInstall(electron) {
 function install(electron) {
   const { createBridge } = require('./bridge-server.cjs');
   const patches = require('./patches/index.cjs');
+  const { DEFAULT_PORT } = require('./constants.cjs');
   const bridge = createBridge({
     electron,
-    port: Number(process.env.ELECTRON2WEB_PORT || 4400),
+    port: Number(process.env.ELECTRON2WEB_PORT || DEFAULT_PORT),
     token: process.env.ELECTRON2WEB_TOKEN,
     layout: process.env.ELECTRON2WEB_LAYOUT || 'desktop',
     publicUrl: process.env.ELECTRON2WEB_PUBLIC_HOST || null,

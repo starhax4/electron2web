@@ -96,7 +96,7 @@ ipcMain.handle('print:pdf', async () => {
 
 ipcMain.on('print:window', (event) => event.sender.print());
 
-ipcMain.on('log',(_event, message) => console.log('[renderer says]', message));
+ipcMain.on('log', (_event, message) => console.log('[renderer says]', message));
 
 ipcMain.on('echo:sync', (event, value) => {
   event.returnValue = { echoed: value, pid: process.pid };

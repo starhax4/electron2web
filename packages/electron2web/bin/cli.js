@@ -6,11 +6,12 @@ const { randomBytes } = require('node:crypto');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { DATA_DIR, DEFAULT_PORT, LAYOUTS } = require('../src/constants.cjs');
 
 const USAGE = `Usage: electron2web [options] [-- <command that starts electron>]
 
 Options:
-  --port <n>         port for the bridge (default 4400)
+  --port <n>         port for the bridge (default ${DEFAULT_PORT})
   --layout <name>    desktop (default): every window is a panel you can move and resize
                      tabs: one window at a time, with a tab strip
                      single: the main window fills the tab, no shell
@@ -32,8 +33,6 @@ Examples:
   electron2web --open -- npm run dev   # also opens the browser
   electron2web --port 5000 --layout tabs -- npx electron-vite dev
   electron2web --public-host https://abc.trycloudflare.com -- npm run dev`;
-
-const LAYOUTS = ['desktop', 'tabs', 'single'];
 
 // chalk ships with the package, but a broken install should still get a readable message
 // from checkDependencies(), so fall back to plain output.
@@ -60,10 +59,10 @@ function fail(message) {
   process.exit(1);
 }
 
-const TOKEN_FILE = path.join(os.homedir(), '.electron2web', 'token');
+const TOKEN_FILE = path.join(DATA_DIR, 'token');
 
 function parseArgs(argv) {
-  const opts = { port: 4400, newToken: false, open: false, debug: false, layout: 'desktop', native: '', publicHost: '', command: [] };
+  const opts = { port: DEFAULT_PORT, newToken: false, open: false, debug: false, layout: 'desktop', native: '', publicHost: '', command: [] };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === '--') {

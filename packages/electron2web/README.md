@@ -22,6 +22,9 @@ Chrome tab: the shell (app.localhost:4400)          real Electron main process (
 
 ## Usage
 
+Step-by-step setup, remote use and troubleshooting are in the
+[user guide](https://github.com/starhax4/electron2web/blob/main/docs/guide.md).
+
 ```bash
 # wrap whatever already starts Electron
 npx electron2web -- npm run dev
@@ -35,8 +38,8 @@ npx electron2web --port 5000 --layout tabs -- npm start
 | `--port <n>` | Port for the bridge (default `4400`) |
 | `--layout desktop` | Default. Every window is a panel you can move, resize, minimise, maximise and close |
 | `--layout tabs` | One window at a time, with a tab strip |
-| `--layout single` | No shell: the main window fills the tab (the old behaviour) |
-| `--native <list>` | Keep features on the host's real OS UI, e.g. `--native dialog,notification` (or `all`). Reserved for the web surfaces landing in P1 |
+| `--layout single` | No shell: the main window fills the tab (simplest target for tests and agents) |
+| `--native <list>` | Keep features on the host's real OS UI, e.g. `--native dialog,notification` (or `all`). Reserved for the planned in-tab dialogs and notifications; no effect yet |
 | `--public-host <url>` | Also serve on a tunnel or reverse-proxy address (cloudflared, ngrok, localtunnel, nginx), e.g. `https://abc.trycloudflare.com`. See "Public host" |
 | `--open` | Open the app in the default browser once ready (first start only) |
 | `--debug` | Log window state changes and every IPC call with its timing |
@@ -114,10 +117,11 @@ after a restart. Old `http://127.0.0.1:4400/` bookmarks redirect to the shell.
   Other WebSocket upgrades (Vite HMR) are piped through to that origin's server.
 - **Restarts.** When Electron restarts (`electron-vite --watch`), the shell shows a banner,
   waits for the bridge, and reloads.
-- **Dialogs.** `dialog.*` stays native for now (in-tab dialogs are P1), with the hidden parent
-  window removed so the dialog actually appears.
+- **Dialogs.** `dialog.*` stays native for now (in-tab dialogs are planned), with the hidden
+  parent window removed so the dialog actually appears.
 
-The roadmap for the rest of the Electron API is in `docs/electron-api-coverage-plan.md`.
+The [roadmap](https://github.com/starhax4/electron2web/blob/main/docs/roadmap.md) covers the
+rest of the Electron API.
 
 ## Public host (tunnels and proxies)
 
@@ -170,24 +174,17 @@ Known limits, as in Electron itself with a preload:
 - the shell delegates camera, microphone, geolocation, clipboard and fullscreen to the app's
   iframes, so the app can ask for them as it would in Electron.
 
-## Verified (examples/basic-app, Electron 33, electron-vite 2, Windows, Chromium)
+## Tested with
 
-- `invoke`, `send`, `event.reply`, `sendSync`, `webContents.send` stream
-- 1 MB `Buffer` → `Uint8Array`; Date/Map/Set/BigInt/undefined round-trip
-- error propagation with Electron's message format
-- `executeJavaScript` from main under a `script-src 'self'` CSP
-- shell: a second window opens as a second panel; drag sends new bounds to main; clicking a
-  panel moves `getFocusedWindow()`; closing a window removes its panel and refocuses the other;
-  `--layout tabs` switches windows from the tab strip
-- auto-reconnect after an Electron main-process restart
-- `--public-host` through a stand-in tunnel (another hostname and port): all IPC checks pass,
-  Vite HMR connects, a second window gets its preload, `loadFile()` build loads under
-  `/__electron2web/s1/`; foreign Host, wrong Origin on WebSocket and `sendSync`, and
-  missing cookie are refused; nginx-style `X-Forwarded-Host` is accepted. Not yet tried
-  against a real https tunnel.
+Electron 33 with electron-vite 2 (the sample app in `examples/basic-app`, 12 IPC checks) and a
+large webpack + React app, on Windows in Chromium. Covered: every IPC path, structured-clone
+values (1 MB `Buffer`, `Date`, `Map`, `Set`, `BigInt`, `undefined`), error propagation,
+`executeJavaScript` under a `script-src 'self'` CSP, multiple windows and focus tracking, the
+`tabs` layout, reconnecting after a main-process restart, and `--public-host` through a local
+stand-in tunnel (including the Host, Origin and cookie checks).
 
-Not yet verified: native dialogs (manual click), `loadFile()` builds, macOS/Linux, Firefox
-(needs `*.localhost` to resolve to loopback).
+Not yet tested: `loadFile()` production builds, a real https tunnel, macOS and Linux, Firefox
+(needs `*.localhost` to resolve to loopback). Reports from those setups are very welcome.
 
 ## Not supported yet
 
