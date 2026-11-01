@@ -7,6 +7,14 @@ const { escapeHtml, page } = require('./http-util.cjs');
 // JSON that is safe inside a <script> element.
 const inlineJson = (value) => JSON.stringify(value).replace(/</g, '\\u003c');
 
+// The start screen, shown until the app's first window is on screen. shell.js keeps its text
+// up to date; `detail` is fixed text, not escaped.
+function splash(detail) {
+  return `<div class="ew-splash" id="ew-splash" role="status">
+<div class="ew-brand">electron<span>2</span>web</div><div class="ew-spinner" aria-hidden="true"></div>
+<p class="ew-splash-title">Starting your app</p><p class="ew-splash-detail">${detail}</p></div>`;
+}
+
 // On the public host the windows share the shell's origin and its cookie, so the shell
 // doesn't need the token to authorise them.
 function shellPage({ token, layout, isPublic }) {
@@ -14,7 +22,7 @@ function shellPage({ token, layout, isPublic }) {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>electron2web</title><link rel="stylesheet" href="${PREFIX}/shell.css">
 <script id="ew-config" type="application/json">${config}</script><script src="${PREFIX}/shell.js" defer></script>
-</head><body class="ew-layout-${layout}"></body></html>`;
+</head><body class="ew-layout-${layout}">${splash('Connecting to the Electron main process…')}</body></html>`;
 }
 
 // Navigates from a page on this origin rather than with a 302: if the request came from
@@ -46,8 +54,15 @@ function notAuthorizedPage() {
   return page('Not authorized', '<p>Open the URL that <code>electron2web</code> printed in your terminal.</p>');
 }
 
+// The single layout before main has a window to redirect to. Polls instead of a meta refresh,
+// so the spinner doesn't restart every second; any answer but 503 means the window is there.
 function waitingPage() {
-  return page('Waiting for the app', '<p>No Electron window has loaded a page yet. This tab refreshes automatically.</p>', 1);
+  const poll = `setInterval(async () => {
+  try { if ((await fetch(location.href, { redirect: 'manual', cache: 'no-store' })).status !== 503) location.reload(); } catch {}
+}, 500);`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>electron2web</title><link rel="stylesheet" href="${PREFIX}/shell.css">
+</head><body>${splash('Your UI appears here once the Electron main process opens its first window.')}<script>${poll}</script></body></html>`;
 }
 
 function unreachablePage({ origin, servedOrigin }) {

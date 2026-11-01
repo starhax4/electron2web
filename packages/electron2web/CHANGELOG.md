@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- A start screen (name, spinner, what it's waiting for) replaces the blank gray tab while the
+  main process starts up, in every layout. Once windows have shown, the same spot says when none
+  are on screen.
+
 ## 0.1.0-beta.3
 
 Internal restructuring: same features and options, no changes needed on your side.

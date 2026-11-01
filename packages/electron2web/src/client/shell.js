@@ -28,9 +28,13 @@
   strip.append(stripItems, status);
   const desktop = el('main', 'ew-desktop');
   desktop.setAttribute('aria-label', 'App windows');
-  const empty = el('p', 'ew-empty', { textContent: 'Waiting for the app to open a window…' });
+  // The start screen comes with the page (so it shows before this script runs) and moves
+  // into the desktop.
+  const splash = document.getElementById('ew-splash');
+  const splashTitle = splash.querySelector('.ew-splash-title');
+  const splashDetail = splash.querySelector('.ew-splash-detail');
   const banner = el('div', 'ew-banner', { role: 'alert', hidden: true });
-  desktop.append(empty);
+  desktop.append(splash);
   document.body.append(banner, ...(layout === 'tabs' ? [strip, desktop] : [desktop, strip]));
 
   // ---------------------------------------------------------------- connection
@@ -173,8 +177,7 @@
       if (panel) panel.root.style.zIndex = String(10 + index * 2);
     });
 
-    const visible = shown.filter(isOnScreen);
-    empty.hidden = visible.length > 0;
+    renderSplash(shown.some(isOnScreen));
     if (layout !== 'single') renderStrip();
     renderStatus();
     const focused = shown.find((view) => view.focused);
@@ -182,6 +185,21 @@
   }
 
   const isOnScreen = (view) => view.visible && !view.minimized;
+
+  // Before the first window shows: the start screen with a spinner. Afterwards, when every
+  // window is hidden or minimized: a plain note, since the app isn't starting any more.
+  let started = false;
+  function renderSplash(anyOnScreen) {
+    started ||= anyOnScreen;
+    splash.hidden = anyOnScreen;
+    splash.classList.toggle('ew-idle', started);
+    splashTitle.textContent = started ? 'No windows on screen' : 'Starting your app';
+    splashDetail.textContent = started
+      ? 'Windows show up here when the app opens or shows them.'
+      : views.size === 0
+        ? 'Your UI appears here once the Electron main process opens its first window.'
+        : 'The app has opened a window. It appears once its page loads and the app shows it.';
+  }
 
   // Keeps a modal child above its parent when the parent is raised.
   function raise(id) {
