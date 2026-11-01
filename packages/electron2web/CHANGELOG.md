@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.0-beta.3
+
+Internal restructuring: same features and options, no changes needed on your side.
+
+- Fixed: on a page with no `<head>` but a `<header>`, the loader script was injected inside the
+  `<header>` tag.
+- The bridge is split into small modules (window registry, IPC socket, shell socket, router,
+  origins, proxy), with unit tests, ESLint and CI on Windows, macOS and Linux (Node 18 and 22).
+- Docs: a [user guide](https://github.com/starhax4/electron2web/blob/main/docs/guide.md) and a
+  public [roadmap](https://github.com/starhax4/electron2web/blob/main/docs/roadmap.md).
+
 ## 0.1.0-beta.2
 
 Renamed from electron-tab to **electron2web**. Uninstall the old one first
